@@ -7,6 +7,7 @@ events such as model calls, tool calls, and sandbox operations.
 
 from inspect_ai import Task, task
 from inspect_ai.dataset import Sample
+from inspect_ai.log import ToolEvent, ModelEvent
 from inspect_ai.scorer import Score, Target, accuracy, scorer
 from inspect_ai.solver import TaskState, generate, use_tools
 from inspect_ai.tool import tool
@@ -61,14 +62,13 @@ def process_aware_scorer():
         events = state.events
         
         # Filter events by type
-        tool_events = [e for e in events if hasattr(e, 'event') and e.event == 'tool']
-        model_events = [e for e in events if hasattr(e, 'event') and e.event == 'model']
+        tool_events = [e for e in events if isinstance(e, ToolEvent)]
+        model_events = [e for e in events if isinstance(e, ModelEvent)]
         
         # Analyze tool usage
         tool_calls = []
         for event in tool_events:
-            if hasattr(event, 'function'):
-                tool_calls.append(event.function)
+            tool_calls.append(event.function)
         
         # Score based on efficiency and correctness
         base_score = 1.0 if target.text in state.output.completion else 0.0
@@ -116,9 +116,9 @@ def step_verification_scorer():
         events = state.events
         
         # Check if the add tool was used
-        tool_events = [e for e in events if hasattr(e, 'event') and e.event == 'tool']
+        tool_events = [e for e in events if isinstance(e, ToolEvent)]
         add_tool_used = any(
-            hasattr(e, 'function') and e.function == 'add' 
+            e.function == 'add' 
             for e in tool_events
         )
         
