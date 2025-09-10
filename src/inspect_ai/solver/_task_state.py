@@ -33,12 +33,6 @@ from inspect_ai.util._limited_conversation import ChatMessageList
 from inspect_ai.util._store import Store, store_jsonable
 from inspect_ai.util._store_model import SMT
 
-# Import for events property (avoid circular import by importing at function level)
-from typing import TYPE_CHECKING
-
-if TYPE_CHECKING:
-    from inspect_ai.log._transcript import Event
-
 
 @dataclass
 class Choice:
@@ -301,9 +295,8 @@ class TaskState:
         evaluation process.
         
         Returns:
-            Sequence of events from the current transcript.
+            Sequence[Event]: Events from the current transcript.
         """
-        # Import here to avoid circular import
         from inspect_ai.log._transcript import transcript
         return transcript().events
 
