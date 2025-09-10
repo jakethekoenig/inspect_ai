@@ -33,6 +33,12 @@ from inspect_ai.util._limited_conversation import ChatMessageList
 from inspect_ai.util._store import Store, store_jsonable
 from inspect_ai.util._store_model import SMT
 
+# Import for events property (avoid circular import by importing at function level)
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from inspect_ai.log._transcript import Event
+
 
 @dataclass
 class Choice:
@@ -284,6 +290,22 @@ class TaskState:
     def store(self) -> Store:
         """Store for shared data"""
         return self._store
+
+    @property
+    def events(self) -> Sequence["Event"]:
+        """Events from the current transcript.
+        
+        Provides access to all events that have occurred during the evaluation
+        of this sample, including model calls, tool calls, sandbox operations,
+        and other logged events. Useful for scorers that need to analyze the
+        evaluation process.
+        
+        Returns:
+            Sequence of events from the current transcript.
+        """
+        # Import here to avoid circular import
+        from inspect_ai.log._transcript import transcript
+        return transcript().events
 
     @property
     def tools(self) -> list[Tool]:
