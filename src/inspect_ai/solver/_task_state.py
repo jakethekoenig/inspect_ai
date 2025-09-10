@@ -297,6 +297,21 @@ class TaskState:
         return self._store
 
     @property
+    def events(self) -> Sequence["Event"]:
+        """Events from the current transcript.
+        
+        Provides access to all events that have occurred during the evaluation
+        of this sample, including model calls, tool calls, sandbox operations,
+        and other logged events. Useful for scorers that need to analyze the
+        evaluation process.
+        
+        Returns:
+            Sequence[Event]: Events from the current transcript.
+        """
+        from inspect_ai.log._transcript import transcript
+        return transcript().events
+
+    @property
     def tools(self) -> list[Tool]:
         """Tools available to the model."""
         return self._tools
